@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace:填写映射当前的Mapper接口，所有的增删改查的参数和返回值类型，
+		就可以直接填写缩写，不区分大小写，直接通过方法名去找类型-->
+    <mapper namespace="resources.com.ssm.mapper.CustomerMapper">
+<!--根据客户编码获取客户信息
+    id:select元素在映射文件中的唯一标识
+    parameterType:传入参数的类型
+    resultType:返回结果的类型
+-->
+    <!--<select id="findCustomerById" parameterType="Integer" resultType="com.ssm.po.Customer">-->
+        <!--select  * from t_customer where id=#{id}-->
+    <!--</select>-->
+    <!-- 定义表的前缀名-->
+    <sql id="tableName">
+        ${prefix}Customer
+    </sql>
+    <!--定义要查询的表-->
+    <sql id="someinclude">
+        from
+          <include refid="${include_target}"></include>
+    </sql>
+    <!--定义查询列-->
+    <sql id="customerColumns">
+        id,username,jobs,phone
+    </sql>
+    <!--查询-->
+    <select id="findCustomerById" parameterType="Integer" resultType="com.ssm.po.Customer">
+        select
+          <include refid="customerColumns"></include>
+          <include refid="someinclude">
+              <property name="prefix" value="t_"></property>
+              <property name="include_target" value="tableName"></property>
+          </include>
+        where id=#{id}
+    </select>
+
+    <select id="findCustomerByName" parameterType="String" resultType="com.ssm.po.Customer">
+        select  * from  t_customer where username like '%${username}%'
+    </select>
+
+    <insert id="addCustomer" parameterType="com.ssm.po.Customer" >
+        insert into t_customer(id,username,jobs,phone) values (#{id},#{username},#{jobs},#{phone})
+    </insert>
+
+    <update id="updataCustomer" parameterType="com.ssm.po.Customer" >
+        update t_customer set  username=#{username},jobs=#{jobs},phone=#{phone}  where id=#{id}
+    </update>
+
+    <delete id="deleteCustomer" parameterType="Integer" >
+        delete from  t_customer where id=#{id}
+    </delete>
+
+    <!--动态sql使用 if-->
+    <select id="findUserByDynamic" parameterType="com.ssm.po.Customer" resultType="com.ssm.po.Customer">
+        select * from t_customer
+        <where>
+            <if test="username!=null">
+             username=#{username}
+            </if>
+            <if test="jobs!=null and jobs!=''">
+               and jobs=#{jobs}
+            </if>
+
+        </where>
+
+    </select>
+    </mapper>
